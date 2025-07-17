@@ -200,7 +200,7 @@ namespace Basis
             {
                 MapServiceToken = Obt.DataSet.AccessToken(),
             };
-            mapControl.Loaded += (o, e) => HideMapWarning(mapControl);
+            mapControl.LoadingStatusChanged += (o, e) => HideMapWarning(mapControl);
 #if (BingSrcMap)
             mapControl.TileSources.Add(BingSrc);
 #else
