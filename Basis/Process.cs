@@ -28,6 +28,7 @@ using Windows.Graphics.Imaging;
 using System.Security.Cryptography;
 using System.Reflection.Metadata.Ecma335;
 using static Basis.Process;
+using Windows.UI.Xaml.Input;
 #endregion
 
 namespace Basis
@@ -38,6 +39,8 @@ namespace Basis
         private static PointD BeijingRd = new PointD(23.122392145071757, 113.26414372867545);   //WGS84
         private static MapControl mapControl;
         private static MapElementsLayer landmarksLayer;
+        private static bool _mapReconstruct;
+
 
         public void UpdateTiles(string[] jsons)
         {
@@ -200,7 +203,25 @@ namespace Basis
             {
                 MapServiceToken = Obt.DataSet.AccessToken(),
             };
-            mapControl.LoadingStatusChanged += (o, e) => HideMapWarning(mapControl);
+#region HdWrn
+            //为了干掉2025年6月30日MapControl弃用后导致弹出的警告水印，也是拼了老命了；
+            //窗口最小化还原后 MapControl 的 Visual Tree 会被重建，但节省资源起见，不能每次更新布局都遍历视觉树；
+            mapControl.Loaded += (o, e) => HideMapWarning(mapControl);
+            mapControl.LoadingStatusChanged += (o, e) =>
+            {
+                if (mapControl.LoadingStatus == MapLoadingStatus.Loading)   //重建视觉树导致地图重新载入
+                    _mapReconstruct = true;
+            };
+            mapControl.LayoutUpdated += (o, e) =>
+            {
+                if(_mapReconstruct)
+                {
+                    HideMapWarning(mapControl);
+                    _mapReconstruct = false;
+                }
+            };
+#endregion HdWrn
+
 #if (BingSrcMap)
             mapControl.TileSources.Add(BingSrc);
 #else
@@ -278,10 +299,11 @@ namespace Basis
 
         public static void HideMapWarning(MapControl map)
         {
+            Trace.WriteLine("HideMapWarning called");
+
             var watermarkElements = FindVisualChildren<Border>(map)
                 .Where(bd => bd.Background is SolidColorBrush brush
                              && brush.Color == Colors.White);
-
             foreach (var element in watermarkElements)
             {
                 element.Visibility = Visibility.Collapsed;
