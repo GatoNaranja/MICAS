@@ -269,8 +269,12 @@ namespace MICAS
                 {
                     if (!isDetailsCanceled)
                     {
-                        string response = DataSet.Get(DataSet.Categories.Realtime | (Cfg.AreaCode << 16), Dt.AddMinutes(i * 15));
-                        ObsWindow[i] = response;
+                        try
+                        {
+                            string response = DataSet.Get(DataSet.Categories.Realtime | (Cfg.AreaCode << 16), Dt.AddMinutes(i * 15));
+                            ObsWindow[i] = response;
+                        }
+                        catch { }
                     }
                     else ObsWindow[i] = "[]";
                 }
