@@ -49,8 +49,8 @@ namespace MICAS
     {
         private DateTimeOffset DetailsCutoff;
         private ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
-        private OrganizableCollection<StationData> StationsData = new OrganizableCollection<StationData>();
-        private OrganizableCollection<StationData> StationsStatistic = new OrganizableCollection<StationData>();
+        private OrganizableCollection<StationData> StationsData = new();
+        private OrganizableCollection<StationData> StationsStatistic = new();
         private OrganizableCollection<StationData>[] Details = new OrganizableCollection<StationData>[Cfg.QueryRnds];
         private bool isDetailsCanceled = false;
         private static object reqLock = new object();
@@ -70,7 +70,6 @@ namespace MICAS
             DetailsCutoff = DateTimeOffset.Now;
             TimePicker.SelectedTime = DetailsCutoff.TimeOfDay;
             currentCutoff.Text = DetailsCutoff.ToString();
-            InitMap();
             region.DataContext = new CityModel();
 
             object area = localSettings.Values["area"];
@@ -88,7 +87,7 @@ namespace MICAS
 
             await AutoQuery(DetailsCutoff);
 
-            rtDataGrid.RowDetailsVisibilityMode = Microsoft.Toolkit.Uwp.UI.Controls.DataGridRowDetailsVisibilityMode.VisibleWhenSelected;
+            InitMap();
         }
 
 
@@ -96,7 +95,6 @@ namespace MICAS
         {
             await Task.Run(async () =>
             {
-                await Task.Delay(53); //等待界面加载完成
                 string rtJson = await QueryRealtimeData(Dt);
                 Stopwatch sw = Stopwatch.StartNew();
                 IEnumerator<dynamic> enumerator = QueryStatisticData(Dt).GetEnumerator();
