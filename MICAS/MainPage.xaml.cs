@@ -65,7 +65,7 @@ namespace MICAS
             coreTitleBar.ExtendViewIntoTitleBar = true;
         }
 
-        private async void Loaded(object sender, RoutedEventArgs e)
+        private new async void Loaded(object sender, RoutedEventArgs e)
         {
             DetailsCutoff = DateTimeOffset.Now;
             TimePicker.SelectedTime = DetailsCutoff.TimeOfDay;
@@ -85,9 +85,8 @@ namespace MICAS
                 Cfg.AutoQueryDetails = (bool)auto;
             }
 
+            await InitMap();
             await AutoQuery(DetailsCutoff);
-
-            InitMap();
         }
 
 
@@ -96,6 +95,8 @@ namespace MICAS
             await Task.Run(async () =>
             {
                 string rtJson = await QueryRealtimeData(Dt);
+                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, AddMapTileSource);
+
                 Stopwatch sw = Stopwatch.StartNew();
                 IEnumerator<dynamic> enumerator = QueryStatisticData(Dt).GetEnumerator();
 
@@ -132,7 +133,7 @@ namespace MICAS
                     });
                 }
                 sw.Stop();
-                await Task.Delay(8000);
+                await Task.Delay(8000); //计时横幅收起时间
             });
             notification.IsOpen = false;
         }

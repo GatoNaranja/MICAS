@@ -29,6 +29,8 @@ using System.Security.Cryptography;
 using System.Reflection.Metadata.Ecma335;
 using static Basis.Process;
 using Windows.UI.Xaml.Input;
+using Windows.UI.Core;
+using System.Threading;
 #endregion
 
 namespace Basis
@@ -173,7 +175,39 @@ namespace Basis
             return MaxTStatistic;
         }
 
-        public static void InitMap()
+        public static async Task InitMap()
+        {
+            mapControl = new MapControl
+            {
+                MapServiceToken = Obt.DataSet.GenAccessToken(),
+            };
+            #region HdWrn
+            //为了干掉2025年6月30日MapControl弃用后导致弹出的警告水印，也是拼了老命了；
+            //窗口最小化还原后 MapControl 的 Visual Tree 会被重建，但节省资源起见，不能每次更新布局都遍历视觉树；
+            mapControl.Loaded += (o, e) =>
+            {
+                HideMapWarning(mapControl);
+            };
+            mapControl.LoadingStatusChanged += (o, e) =>
+            {
+                if (mapControl.LoadingStatus == MapLoadingStatus.Loading)   //重建视觉树导致地图重新载入
+                    _mapReconstruct = true;
+            };
+            mapControl.LayoutUpdated += (o, e) =>
+            {
+                if (_mapReconstruct)
+                {
+                    HideMapWarning(mapControl);
+                    _mapReconstruct = false;
+                }
+            };
+
+            await Task.Delay(55);
+
+            #endregion HdWrn
+        }
+
+        public static void AddMapTileSource()
         {
 #if (BingSrcMap)
             //因为DataGrid的RowDetails在滚动过程中会涉及GC主动释放资源，导致很多时候IRandomAccessStreamReference被释放掉导致莫名其妙的卡死或崩溃；
@@ -196,34 +230,10 @@ namespace Basis
                 "https://mapnew.geoq.cn/ArcGIS/rest/services/ChinaOnlineCommunity_Mobile/MapServer/tile/{zoomlevel}/{y}/{x}");
 
             // Create a tile source and add it to the Map control.
-            MapTileSource tileSource = new MapTileSource(dataSource);
-            tileSource.IsFadingEnabled = false;
+            MapTileSource tileSource = new MapTileSource(dataSource) { IsFadingEnabled = false };
 #endif
-            mapControl = new MapControl
-            {
-                MapServiceToken = Obt.DataSet.GenAccessToken(),
-            };
-            #region HdWrn
-            //为了干掉2025年6月30日MapControl弃用后导致弹出的警告水印，也是拼了老命了；
-            //窗口最小化还原后 MapControl 的 Visual Tree 会被重建，但节省资源起见，不能每次更新布局都遍历视觉树；
-            mapControl.Loaded += (o, e) => HideMapWarning(mapControl);
-            mapControl.LoadingStatusChanged += (o, e) =>
-            {
-                if (mapControl.LoadingStatus == MapLoadingStatus.Loading)   //重建视觉树导致地图重新载入
-                    _mapReconstruct = true;
-            };
-            mapControl.LayoutUpdated += (o, e) =>
-            {
-                if (_mapReconstruct)
-                {
-                    HideMapWarning(mapControl);
-                    _mapReconstruct = false;
-                }
-            };
-            #endregion HdWrn
-
 #if (BingSrcMap)
-            mapControl.TileSources.Add(BingSrc);
+                mapControl.TileSources.Add(BingSrc);
 #else
             mapControl.TileSources.Add(tileSource);
 #endif
