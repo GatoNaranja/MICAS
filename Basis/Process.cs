@@ -175,7 +175,7 @@ namespace Basis
             return MaxTStatistic;
         }
 
-        public static async Task InitMap()
+        public static void InitMap()
         {
             mapControl = new MapControl
             {
@@ -201,9 +201,6 @@ namespace Basis
                     _mapReconstruct = false;
                 }
             };
-
-            await Task.Delay(55);
-
             #endregion HdWrn
         }
 

@@ -65,11 +65,14 @@ namespace MICAS
             coreTitleBar.ExtendViewIntoTitleBar = true;
         }
 
-        private new async void Loaded(object sender, RoutedEventArgs e)
+        private new void Loaded(object sender, RoutedEventArgs e)
         {
             DetailsCutoff = DateTimeOffset.Now;
             TimePicker.SelectedTime = DetailsCutoff.TimeOfDay;
             currentCutoff.Text = DetailsCutoff.ToString();
+
+            InitMap();
+
             region.DataContext = new CityModel();
 
             object area = localSettings.Values["area"];
@@ -85,8 +88,7 @@ namespace MICAS
                 Cfg.AutoQueryDetails = (bool)auto;
             }
 
-            await InitMap();
-            await AutoQuery(DetailsCutoff);
+            AutoQuery(DetailsCutoff);
         }
 
 
@@ -825,8 +827,12 @@ namespace MICAS
             StationData data = e.AddedItems[0] as StationData;
             Last = data;
 
-
+            QueryDetailMetInfo(data);
             ProcessDetailMap(data);
+        }
+
+        private async Task QueryDetailMetInfo(StationData data)
+        {
             await Task.Run(async () =>
             {
                 DateTimeOffset Dt = new DateTimeOffset(DetailsCutoff.Year, DetailsCutoff.Month, DetailsCutoff.Day, DetailsCutoff.Hour, DetailsCutoff.Minute / 5 * 5, 0, TimeSpan.FromHours(8));
