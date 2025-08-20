@@ -390,6 +390,7 @@ namespace MICAS
             rt_loading.Visibility = Visibility.Visible;
             StationsData.Clear();
 
+            pkDataGrid.SelectedIndex = -1;
             rtDataGrid.ItemsSource = null;
             rtDataGrid.ContextFlyout.Hide();
             rtGroup.IsChecked = false;
@@ -409,12 +410,14 @@ namespace MICAS
             pk_loading.Visibility = Visibility.Visible;
             StationsStatistic.Clear();
 
+            pkDataGrid.SelectedIndex = -1;
             pkDataGrid.ItemsSource = null;
             pkDataGrid.ContextFlyout.Hide();
             pkGroup.IsChecked = false;
             pkDowntown.IsChecked = false;
 
             await AutoQueryStatistic(DetailsCutoff);
+
             foreach (var dgColumn in pkDataGrid.Columns)
             {
                 dgColumn.SortDirection = null;
@@ -435,6 +438,9 @@ namespace MICAS
             pk_loading.Visibility = Visibility.Visible;
             StationsData.Clear();
             StationsStatistic.Clear();
+
+            rtDataGrid.SelectedIndex = -1;
+            pkDataGrid.SelectedIndex = -1;
 
             rtDataGrid.ItemsSource = null;
             rtDataGrid.ContextFlyout.Hide();
@@ -463,8 +469,8 @@ namespace MICAS
         private async void Pres_Sync(object sender, RoutedEventArgs e)
         {
             pk_loading.Visibility = Visibility.Visible;
-            //StationsStatistic.Clear();
 
+            pkDataGrid.SelectedIndex = -1;
             pkDataGrid.ItemsSource = null;
             pkDataGrid.ContextFlyout.Hide();
             pkGroup.IsChecked = false;
@@ -482,6 +488,7 @@ namespace MICAS
 
         private async void rtdg_Group(object sender, RoutedEventArgs e)
         {
+            rtDataGrid.SelectedIndex = -1;
             rtDataGrid.ContextFlyout.Hide();
             rt_loading.Visibility = Visibility.Visible;
 
