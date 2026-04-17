@@ -15,6 +15,17 @@ namespace Basis
     public class StationData : INotifyPropertyChanged
     {
         public PrimaryInfo PrimaryInfo { get; set; }
+
+        private bool _isDowntown;
+        public bool IsDowntown
+        {
+            get => _isDowntown;
+            set { 
+                _isDowntown = value; 
+                NotifyPropertyChanged(nameof(IsDowntown));
+            }
+        }
+
         public StatisticData StatisticData { get; set; }
         public ObserveData ObserveData { get; set; }
 

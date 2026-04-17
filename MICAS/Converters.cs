@@ -6,7 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Telerik.Charting;
 using Telerik.UI.Xaml.Controls.Chart;
+using Windows.UI;
 using Windows.UI.Xaml.Data;
+using Windows.UI.Xaml.Media;
 
 namespace MICAS
 {
@@ -147,5 +149,18 @@ namespace MICAS
         {
             throw new NotImplementedException();
         }
+    }
+
+    public class StationBackgroundConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            return (value is bool b && b)
+                ? new SolidColorBrush(Colors.LightGoldenrodYellow)
+                : new SolidColorBrush(Colors.Transparent);
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+            => throw new NotImplementedException();
     }
 }

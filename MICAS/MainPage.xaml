@@ -18,6 +18,7 @@
         <local:AxisMinimumConverter x:Key="AxisMinimumConverter"/>
         <local:AxisMaximumConverter x:Key="AxisMaximumConverter"/>
         <local:PrecipValueConverter x:Key="PrecipValueConverter"/>
+        <local:StationBackgroundConverter x:Key="BoolToBackgroundConverter"/>
         <SolidColorBrush x:Key="PrimaryColor" Color="#FF6600"/>
         <SolidColorBrush x:Key="PrimaryText" Color="Black"/>
         <SolidColorBrush x:Key="AccentText" Color="#CB3800"/>
@@ -49,6 +50,61 @@
                 </telerik:PaletteEntryCollection>
             </telerik:ChartPalette.StrokeEntries>
         </telerik:ChartPalette>
+
+        <Style x:Key="FixedCellStyle" TargetType="controls:DataGridCell">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="controls:DataGridCell">
+                        <Border BorderBrush="#28000000" BorderThickness="0,0,1,0">
+                            <ContentPresenter/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+
+        <!--<Style x:Key="DataGridCellStyle" TargetType="controls:DataGridCell">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="controls:DataGridCell">
+                        <Grid>
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CurrentStates">
+                                    <VisualState x:Name="Regular"/>
+                                    <VisualState x:Name="CurrentWithFocus">
+                                        <VisualState.Setters>
+                                            <Setter Target="FocusBorder.Visibility" Value="Visible"/>
+                                            <Setter Target="FocusBorderInvert.Visibility" Value="Visible"/>
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+
+                            --><!-- ① DataTemplate content renders here (lower z-order) --><!--
+                            <Border BorderBrush="#28000000" BorderThickness="0,0,1,0">
+                                <ContentPresenter/>
+                            </Border>
+
+                            --><!-- ② Focus border renders ON TOP regardless of content background --><!--
+                            <Border x:Name="FocusBorderInvert"
+                                    BorderBrush="White"
+                                    BorderThickness="3"
+                                    IsHitTestVisible="False"
+                                    Visibility="Collapsed"/>
+                            <Border x:Name="FocusBorder"
+                                    BorderBrush="Black"
+                                    BorderThickness="2"
+                                    IsHitTestVisible="False"
+                                    Visibility="Collapsed"/>
+                        </Grid>
+
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>-->
+
+
         <DataTemplate x:Key="TrackInfoTemplate">
             <StackPanel>
                 <TextBlock Margin="5" Foreground="{StaticResource Orange}"><Run Text="{Binding DataPoint.DataItem.t}"/></TextBlock>
@@ -518,21 +574,32 @@
         LoadingRowGroup="dg_LoadingRowGroup"
         SelectionChanged="dg_SelC">
                             <controls:DataGrid.Columns>
-                                <controls:DataGridTextColumn Header="站号" Binding="{Binding PrimaryInfo.StationID}" Tag="StationID"/>
-                                <controls:DataGridTextColumn Header="类型" Binding="{Binding PrimaryInfo.StationType, Converter={StaticResource StationTypeConverter}}" Tag="StationType"/>
-                                <controls:DataGridTextColumn Header="观象站" Binding="{Binding PrimaryInfo.Name}" Tag="Name"/>
-                                <controls:DataGridTextColumn Header="风向角" Binding="{Binding ObserveData.WindDirect, Converter={StaticResource Int32ValidityConverter}}" Tag="WindDirect" />
-                                <controls:DataGridTextColumn Header="风向" Binding="{Binding ObserveData.WindDirectDescription}" Tag="WindDirectDescription" />
-                                <controls:DataGridTextColumn Header="风速" Binding="{Binding ObserveData.WindSpeed, Converter={StaticResource AccuracyConverter}, Mode=OneWay}" Tag="WindSpeed" />
-                                <controls:DataGridTextColumn Header="阵风角" Binding="{Binding ObserveData.GustDirect, Converter={StaticResource Int32ValidityConverter}}" Tag="GustDirect" />
-                                <controls:DataGridTextColumn Header="阵风向" Binding="{Binding ObserveData.GustDirectDescription}" Tag="GustDirectDescription" />
-                                <controls:DataGridTextColumn Header="阵风" Binding="{Binding ObserveData.GustSpeed, Converter={StaticResource AccuracyConverter}, Mode=OneWay}" Tag="GustSpeed" />
-                                <controls:DataGridTextColumn Header="气温" Binding="{Binding ObserveData.Temperature, Converter={StaticResource AccuracyConverter}, Mode=OneWay}" Tag="Temperature"/>
-                                <controls:DataGridTextColumn Header="露点" Binding="{Binding ObserveData.DewPoint, Converter={StaticResource DoubleValidityConverter}, Mode=OneWay}" Tag="DewPoint"/>
-                                <controls:DataGridTextColumn Header="气压" Binding="{Binding ObserveData.Pressure, Converter={StaticResource DoubleValidityConverter}, Mode=OneWay}" Tag="Pressure"/>
-                                <controls:DataGridTextColumn Header="RH" Binding="{Binding ObserveData.RelativeHumidity, Converter={StaticResource Int32ValidityConverter}, Mode=OneWay}" Tag="RH" />
-                                <controls:DataGridTextColumn Header="时雨" Binding="{Binding ObserveData.Rain, Converter={StaticResource DoubleValidityConverter}, Mode=OneWay}" Tag="Rain" />
-                                <controls:DataGridTextColumn Header="能见度" Binding="{Binding ObserveData.Visible, Converter={StaticResource DoubleValidityConverter}, Mode=OneWay}" Tag="Visible" />
+                                <controls:DataGridTextColumn Header="站号" Binding="{Binding PrimaryInfo.StationID}" CellStyle="{StaticResource FixedCellStyle}" Tag="StationID"/>
+                                <controls:DataGridTemplateColumn Header="类型" CellStyle="{StaticResource FixedCellStyle}" Tag="StationType">
+                                    <controls:DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Border Background="{Binding IsDowntown, Converter={StaticResource BoolToBackgroundConverter}}">
+                                                <TextBlock
+                Text="{Binding PrimaryInfo.StationType, Converter={StaticResource StationTypeConverter}}"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"/>
+                                            </Border>
+                                        </DataTemplate>
+                                    </controls:DataGridTemplateColumn.CellTemplate>
+                                </controls:DataGridTemplateColumn>
+                                <controls:DataGridTextColumn Header="观象站" Binding="{Binding PrimaryInfo.Name}" CellStyle="{StaticResource FixedCellStyle}" Tag="Name"/>
+                                <controls:DataGridTextColumn Header="风向角" Binding="{Binding ObserveData.WindDirect, Converter={StaticResource Int32ValidityConverter}}" CellStyle="{StaticResource FixedCellStyle}" Tag="WindDirect" />
+                                <controls:DataGridTextColumn Header="风向" Binding="{Binding ObserveData.WindDirectDescription}" CellStyle="{StaticResource FixedCellStyle}" Tag="WindDirectDescription" />
+                                <controls:DataGridTextColumn Header="风速" Binding="{Binding ObserveData.WindSpeed, Converter={StaticResource AccuracyConverter}, Mode=OneWay}" CellStyle="{StaticResource FixedCellStyle}" Tag="WindSpeed" />
+                                <controls:DataGridTextColumn Header="阵风角" Binding="{Binding ObserveData.GustDirect, Converter={StaticResource Int32ValidityConverter}}" CellStyle="{StaticResource FixedCellStyle}" Tag="GustDirect" />
+                                <controls:DataGridTextColumn Header="阵风向" Binding="{Binding ObserveData.GustDirectDescription}" CellStyle="{StaticResource FixedCellStyle}" Tag="GustDirectDescription" />
+                                <controls:DataGridTextColumn Header="阵风" Binding="{Binding ObserveData.GustSpeed, Converter={StaticResource AccuracyConverter}, Mode=OneWay}" CellStyle="{StaticResource FixedCellStyle}" Tag="GustSpeed" />
+                                <controls:DataGridTextColumn Header="气温" Binding="{Binding ObserveData.Temperature, Converter={StaticResource AccuracyConverter}, Mode=OneWay}" CellStyle="{StaticResource FixedCellStyle}" Tag="Temperature"/>
+                                <controls:DataGridTextColumn Header="露点" Binding="{Binding ObserveData.DewPoint, Converter={StaticResource DoubleValidityConverter}, Mode=OneWay}" CellStyle="{StaticResource FixedCellStyle}" Tag="DewPoint"/>
+                                <controls:DataGridTextColumn Header="气压" Binding="{Binding ObserveData.Pressure, Converter={StaticResource DoubleValidityConverter}, Mode=OneWay}" CellStyle="{StaticResource FixedCellStyle}" Tag="Pressure"/>
+                                <controls:DataGridTextColumn Header="RH" Binding="{Binding ObserveData.RelativeHumidity, Converter={StaticResource Int32ValidityConverter}, Mode=OneWay}" CellStyle="{StaticResource FixedCellStyle}" Tag="RH" />
+                                <controls:DataGridTextColumn Header="时雨" Binding="{Binding ObserveData.Rain, Converter={StaticResource DoubleValidityConverter}, Mode=OneWay}" CellStyle="{StaticResource FixedCellStyle}" Tag="Rain" />
+                                <controls:DataGridTextColumn Header="能见度" Binding="{Binding ObserveData.Visible, Converter={StaticResource DoubleValidityConverter}, Mode=OneWay}" CellStyle="{StaticResource FixedCellStyle}" Tag="Visible" />
                             </controls:DataGrid.Columns>
                             <controls:DataGrid.ContextFlyout>
                                 <CommandBarFlyout Placement="RightEdgeAlignedTop">
@@ -597,16 +664,27 @@
         LoadingRowGroup="dg_LoadingRowGroup"
         SelectionChanged="dg_SelC">
                             <controls:DataGrid.Columns>
-                                <controls:DataGridTextColumn Header="站号" Binding="{Binding PrimaryInfo.StationID}" Tag="StationID"/>
-                                <controls:DataGridTextColumn Header="类型" Binding="{Binding PrimaryInfo.StationType, Converter={StaticResource StationTypeConverter}}" Tag="StationType"/>
-                                <controls:DataGridTextColumn Header="观象站" Binding="{Binding PrimaryInfo.Name}" Tag="Name" Width="500"/>
-                                <controls:DataGridTextColumn Header="最大风速" Binding="{Binding StatisticData.MaxWindSpeed, Converter={StaticResource AccuracyConverter}, Mode=OneWay}" Tag="MaxWindSpeed" />
-                                <controls:DataGridTextColumn Header="最大阵风" Binding="{Binding StatisticData.MaxGustSpeed, Converter={StaticResource AccuracyConverter}, Mode=OneWay}" Tag="MaxGustSpeed" />
-                                <controls:DataGridTextColumn Header="最高温" Binding="{Binding StatisticData.MaxTemperature, Converter={StaticResource AccuracyConverter}, Mode=OneWay}" Tag="MaxTemperature"/>
-                                <controls:DataGridTextColumn Header="最低温" Binding="{Binding StatisticData.MinTemperature, Converter={StaticResource AccuracyConverter}, Mode=OneWay}" Tag="MinTemperature"/>
-                                <controls:DataGridTextColumn Header="最大温差" Binding="{Binding StatisticData.DifTemperature, Converter={StaticResource AccuracyConverter}, Mode=OneWay}" Tag="DifTemperature"/>
-                                <controls:DataGridTextColumn Header="8-8雨" Binding="{Binding StatisticData.Precip0808, Converter={StaticResource DoubleValidityConverter}, Mode=OneWay}" Tag="Precip0808" />
-                                <controls:DataGridTextColumn Header="变压" Binding="{Binding StatisticData.DiffPressure, Converter={StaticResource DoubleValidityConverter}, Mode=OneWay}" Tag="DiffPressure" />
+                                <controls:DataGridTextColumn Header="站号" Binding="{Binding PrimaryInfo.StationID}" CellStyle="{StaticResource FixedCellStyle}" Tag="StationID"/>
+                                <controls:DataGridTemplateColumn Header="类型"  Tag="StationType" CellStyle="{StaticResource FixedCellStyle}">
+                                    <controls:DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Border Background="{Binding IsDowntown, Converter={StaticResource BoolToBackgroundConverter}}">
+                                                <TextBlock
+                Text="{Binding PrimaryInfo.StationType, Converter={StaticResource StationTypeConverter}}"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"/>
+                                            </Border>
+                                        </DataTemplate>
+                                    </controls:DataGridTemplateColumn.CellTemplate>
+                                    </controls:DataGridTemplateColumn>
+                                <controls:DataGridTextColumn Header="观象站" Binding="{Binding PrimaryInfo.Name}" CellStyle="{StaticResource FixedCellStyle}" Tag="Name" Width="500"/>
+                                <controls:DataGridTextColumn Header="最大风速" Binding="{Binding StatisticData.MaxWindSpeed, Converter={StaticResource AccuracyConverter}, Mode=OneWay}" CellStyle="{StaticResource FixedCellStyle}" Tag="MaxWindSpeed" />
+                                <controls:DataGridTextColumn Header="最大阵风" Binding="{Binding StatisticData.MaxGustSpeed, Converter={StaticResource AccuracyConverter}, Mode=OneWay}" CellStyle="{StaticResource FixedCellStyle}" Tag="MaxGustSpeed" />
+                                <controls:DataGridTextColumn Header="最高温" Binding="{Binding StatisticData.MaxTemperature, Converter={StaticResource AccuracyConverter}, Mode=OneWay}" CellStyle="{StaticResource FixedCellStyle}" Tag="MaxTemperature"/>
+                                <controls:DataGridTextColumn Header="最低温" Binding="{Binding StatisticData.MinTemperature, Converter={StaticResource AccuracyConverter}, Mode=OneWay}" CellStyle="{StaticResource FixedCellStyle}" Tag="MinTemperature"/>
+                                <controls:DataGridTextColumn Header="最大温差" Binding="{Binding StatisticData.DifTemperature, Converter={StaticResource AccuracyConverter}, Mode=OneWay}" CellStyle="{StaticResource FixedCellStyle}" Tag="DifTemperature"/>
+                                <controls:DataGridTextColumn Header="8-8雨" Binding="{Binding StatisticData.Precip0808, Converter={StaticResource DoubleValidityConverter}, Mode=OneWay}" CellStyle="{StaticResource FixedCellStyle}" Tag="Precip0808" />
+                                <controls:DataGridTextColumn Header="变压" Binding="{Binding StatisticData.DiffPressure, Converter={StaticResource DoubleValidityConverter}, Mode=OneWay}" CellStyle="{StaticResource FixedCellStyle}" Tag="DiffPressure" />
                             </controls:DataGrid.Columns>
                             <controls:DataGrid.ContextFlyout>
                                 <CommandBarFlyout Placement="RightEdgeAlignedTop">

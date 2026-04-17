@@ -160,6 +160,10 @@ namespace MICAS
             if (StationsData.Count > 0)
             {
                 string appTitle = $"广州市分区自动站数据 - {StationsData.Count}站数据（{StationsData[0].ObserveData.ObserveTime:F}更新）";
+                foreach (var station in StationsData)
+                {
+                    station.IsDowntown = Cfg.Downtown.Contains(station.PrimaryInfo.StationID);
+                }
                 await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal,
                 () =>
                 {
@@ -194,6 +198,10 @@ namespace MICAS
             });
             yield return jsons;
             OrganizableCollection<StationData> Statistic = OrganizeStatisticData(jsons);
+            foreach (var station in Statistic)
+            {
+                station.IsDowntown = Cfg.Downtown.Contains(station.PrimaryInfo.StationID);
+            }
 
             new Task(async () =>
             {
@@ -834,8 +842,8 @@ namespace MICAS
             StationData data = e.AddedItems[0] as StationData;
             Last = data;
 
-            QueryDetailMetInfo(data);
             ProcessDetailMap(data);
+            QueryDetailMetInfo(data);
         }
 
         private async Task QueryDetailMetInfo(StationData data)
