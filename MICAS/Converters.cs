@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Basis;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
@@ -6,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Telerik.Charting;
 using Telerik.UI.Xaml.Controls.Chart;
+using Windows.Foundation.Numerics;
 using Windows.UI;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Media;
@@ -155,9 +157,15 @@ namespace MICAS
     {
         public object Convert(object value, Type targetType, object parameter, string language)
         {
-            return (value is bool b && b)
-                ? new SolidColorBrush(Colors.LightGoldenrodYellow)
-                : new SolidColorBrush(Colors.Transparent);
+            return value switch
+            {
+                StationData.Classification.Downtown => new SolidColorBrush(Colors.LightGoldenrodYellow),
+                StationData.Classification.Buoy => new SolidColorBrush(Colors.LightBlue),
+                StationData.Classification.Platform => new SolidColorBrush(Colors.PaleTurquoise),
+                StationData.Classification.Island => new SolidColorBrush(Colors.LightCyan),
+                _ => new SolidColorBrush(Colors.Transparent),
+            };
+
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, string language)

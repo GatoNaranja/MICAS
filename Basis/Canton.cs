@@ -16,13 +16,13 @@ namespace Basis
     {
         public PrimaryInfo PrimaryInfo { get; set; }
 
-        private bool _isDowntown;
-        public bool IsDowntown
+        private Classification _category;
+        public Classification Category
         {
-            get => _isDowntown;
-            set { 
-                _isDowntown = value; 
-                NotifyPropertyChanged(nameof(IsDowntown));
+            get => _category;
+            set {
+                _category = value; 
+                NotifyPropertyChanged(nameof(Category));
             }
         }
 
@@ -49,6 +49,17 @@ namespace Basis
                 _UIBundle = value;
                 NotifyPropertyChanged(nameof(UIBundle));
             }
+        }
+
+        public enum Classification
+        {
+            National,
+            Automatic,
+            Downtown,
+            Buoy,
+            Platform,
+            Island,
+            Coastal,
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

@@ -18,7 +18,7 @@
         <local:AxisMinimumConverter x:Key="AxisMinimumConverter"/>
         <local:AxisMaximumConverter x:Key="AxisMaximumConverter"/>
         <local:PrecipValueConverter x:Key="PrecipValueConverter"/>
-        <local:StationBackgroundConverter x:Key="BoolToBackgroundConverter"/>
+        <local:StationBackgroundConverter x:Key="StationBackgroundConverter"/>
         <SolidColorBrush x:Key="PrimaryColor" Color="#FF6600"/>
         <SolidColorBrush x:Key="PrimaryText" Color="Black"/>
         <SolidColorBrush x:Key="AccentText" Color="#CB3800"/>
@@ -578,7 +578,7 @@
                                 <controls:DataGridTemplateColumn Header="类型" CellStyle="{StaticResource FixedCellStyle}" Tag="StationType">
                                     <controls:DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <Border Background="{Binding IsDowntown, Converter={StaticResource BoolToBackgroundConverter}}">
+                                            <Border Background="{Binding Category, Converter={StaticResource StationBackgroundConverter}}">
                                                 <TextBlock
                 Text="{Binding PrimaryInfo.StationType, Converter={StaticResource StationTypeConverter}}"
                 HorizontalAlignment="Center"
@@ -668,7 +668,7 @@
                                 <controls:DataGridTemplateColumn Header="类型"  Tag="StationType" CellStyle="{StaticResource FixedCellStyle}">
                                     <controls:DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <Border Background="{Binding IsDowntown, Converter={StaticResource BoolToBackgroundConverter}}">
+                                            <Border Background="{Binding Category, Converter={StaticResource StationBackgroundConverter}}">
                                                 <TextBlock
                 Text="{Binding PrimaryInfo.StationType, Converter={StaticResource StationTypeConverter}}"
                 HorizontalAlignment="Center"

@@ -31,6 +31,7 @@ using static Basis.Process;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Core;
 using System.Threading;
+using static System.Net.Mime.MediaTypeNames;
 #endregion
 
 namespace Basis
@@ -86,9 +87,9 @@ namespace Basis
         }
 
 
-        public class DiffPresCollection<T> : OrganizableCollection<T> where T : StationData, new()
+        public class PresChangeCollection<T> : OrganizableCollection<T> where T : StationData, new()
         {
-            public DiffPresCollection(OrganizableCollection<T> Statistic) : base(Statistic) { }
+            public PresChangeCollection(OrganizableCollection<T> Statistic) : base(Statistic) { }
 
             public override void OrganizeStatisticData(string json)
             {
@@ -112,6 +113,29 @@ namespace Basis
                 }
             }
         }
+
+        public static OrganizableCollection<StationData> Classify(OrganizableCollection<StationData> Stations)
+        {
+            bool isDowntown = false;
+            foreach (var Station in Stations)
+            {
+                isDowntown = Cfg.Downtown.Contains(Station.PrimaryInfo.StationID);
+                int v = Station.PrimaryInfo.StationType;
+                Station.Category = v switch
+                {
+                    1 => StationData.Classification.National,
+                    2 => StationData.Classification.Automatic,
+                    8 => StationData.Classification.Buoy,
+                    8192 => StationData.Classification.Platform,
+                    512 => StationData.Classification.Island,
+                    1024 => StationData.Classification.Coastal,
+                    _ => StationData.Classification.Automatic
+                };
+                Station.Category = isDowntown ? StationData.Classification.Downtown : Station.Category;
+            }
+            return Stations;
+        }
+
 
         public static OrganizableCollection<StationData> OrganizeStatisticData(string[] jsons)
         {

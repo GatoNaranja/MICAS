@@ -160,10 +160,7 @@ namespace MICAS
             if (StationsData.Count > 0)
             {
                 string appTitle = $"广州市分区自动站数据 - {StationsData.Count}站数据（{StationsData[0].ObserveData.ObserveTime:F}更新）";
-                foreach (var station in StationsData)
-                {
-                    station.IsDowntown = Cfg.Downtown.Contains(station.PrimaryInfo.StationID);
-                }
+                StationsData = Classify(StationsData);
                 await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal,
                 () =>
                 {
@@ -174,6 +171,7 @@ namespace MICAS
                     rt_loading.Visibility = Visibility.Collapsed;
                 });
             }
+
             return rtJson;
         }
 
@@ -198,10 +196,7 @@ namespace MICAS
             });
             yield return jsons;
             OrganizableCollection<StationData> Statistic = OrganizeStatisticData(jsons);
-            foreach (var station in Statistic)
-            {
-                station.IsDowntown = Cfg.Downtown.Contains(station.PrimaryInfo.StationID);
-            }
+            Statistic = Classify(Statistic);
 
             new Task(async () =>
             {
@@ -238,7 +233,7 @@ namespace MICAS
 
             });
 
-            OrganizableCollection<StationData> Statistic = new DiffPresCollection<StationData>(StationsStatistic);// OrganizeStatisticData(jsons);
+            OrganizableCollection<StationData> Statistic = new PresChangeCollection<StationData>(StationsStatistic);// OrganizeStatisticData(jsons);
             Statistic.OrganizeStatisticData(json);  //数据处理到StationsStatistic
 
             new Task(async () =>
