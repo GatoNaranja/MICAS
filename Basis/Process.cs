@@ -123,13 +123,13 @@ namespace Basis
                 int v = Station.PrimaryInfo.StationType;
                 Station.Category = v switch
                 {
-                    1 => StationData.Classification.National,
-                    2 => StationData.Classification.Automatic,
-                    8 => StationData.Classification.Buoy,
-                    8192 => StationData.Classification.Platform,
-                    512 => StationData.Classification.Island,
-                    1024 => StationData.Classification.Coastal,
-                    _ => StationData.Classification.Automatic
+                    1       => StationData.Classification.National,
+                    2       => StationData.Classification.Automatic,
+                    8       => StationData.Classification.Buoy,
+                    8192    => StationData.Classification.Platform,
+                    512     => StationData.Classification.Island,
+                    1024    => StationData.Classification.Coastal,
+                    _       => StationData.Classification.Automatic
                 };
                 Station.Category = isDowntown ? StationData.Classification.Downtown : Station.Category;
             }
